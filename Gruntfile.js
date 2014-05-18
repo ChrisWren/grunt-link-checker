@@ -3,7 +3,10 @@ module.exports = function (grunt) {
   grunt.initConfig({
     'link-checker': {
       all: {
-        site: 'example.com'
+        site: 'localhost',
+        options: {
+          initialPort: 9001
+        }
       }
     },
     mdlint: ['README.md'],
@@ -14,11 +17,19 @@ module.exports = function (grunt) {
       files: {
         src:  ['*.js', 'tasks/*.js']
       }
+    },
+    connect: {
+      server: {
+        options: {
+          port: 9001,
+          base: 'test/fixtures'
+        }
+      }
     }
   });
 
   grunt.registerTask('default', ['link-checker']);
-  grunt.registerTask('test', ['jshint', 'link-checker']);
+  grunt.registerTask('test', ['jshint', 'connect', 'link-checker']);
   grunt.loadTasks('tasks');
 
 };

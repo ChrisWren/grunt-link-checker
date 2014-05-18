@@ -6,6 +6,9 @@
  * Licensed under the MIT license.
  */
 
+var Crawler = require('simplecrawler');
+var cheerio = require('cheerio');
+
 module.exports = function (grunt) {
   'use strict';
   grunt.registerMultiTask('link-checker', 'Checks your site for broken links after a build.', function () {
@@ -13,13 +16,13 @@ module.exports = function (grunt) {
     var done = this.async();
     var options = this.options();
     var errors = false;
-    var Crawler = require('simplecrawler');
-    var crawler = new Crawler(this.data.site);
+    var site = this.data.site;
+
+    var crawler = new Crawler(site);
 
     Object.keys(options).forEach(function(key) {
       crawler[key] = options[key];
     });
-
     crawler
       .on('fetch404',function(queueItem) {
         errors = true;
@@ -38,7 +41,26 @@ module.exports = function (grunt) {
         errors = true;
       })
       .on('complete', function() {
+        if (!errors) {
+          grunt.log.ok('No broken links found at: ' + site);
+        }
         done(!errors);
+      })
+      .on('fetchcomplete', function(queueItem, responseBuffer) {
+        grunt.log.debug('Fetched: ' + queueItem.url);
+        var html = responseBuffer.toString();
+        var $ = cheerio.load(html);
+
+        $('a[href*="#"]').each(function(i, anchor) {
+          crawler.queueURL($(anchor).attr('href'));
+        });
+
+        if (queueItem.url.indexOf('#') !== -1) {
+          if ($(queueItem.url.slice(queueItem.url.indexOf('#'))).length === 0) {
+            grunt.log.error('Error finding content with the following id while at ' + queueItem.url);
+            errors = true;
+          }
+        }
       });
 
     crawler.start();
