@@ -3,7 +3,7 @@ module.exports = function (grunt) {
   grunt.initConfig({
     'link-checker': {
       all: {
-        site: 'chrisawren.com'
+        site: 'example.com'
       }
     },
     mdlint: ['README.md'],
@@ -40,6 +40,7 @@ module.exports = function (grunt) {
   });
 
   grunt.registerTask('default', ['link-checker']);
+  grunt.registerTask('test', ['jshint', 'link-checker']);
   grunt.loadTasks('tasks');
 
 };

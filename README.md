@@ -24,7 +24,7 @@ The minimal usage of grunt-link-checker runs with a `site` specified:
 ```js
 'link-checker': {
   dev: {
-    site: 'chrisawren.com'
+    site: 'example.com'
   }
 }
 ```
