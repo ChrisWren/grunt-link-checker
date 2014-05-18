@@ -8,6 +8,7 @@
 
 var Crawler = require('simplecrawler');
 var cheerio = require('cheerio');
+require('colors');
 
 module.exports = function (grunt) {
   'use strict';
@@ -26,18 +27,18 @@ module.exports = function (grunt) {
     crawler
       .on('fetch404',function(queueItem) {
         errors = true;
-        grunt.log.error('Resource not found while at ' + queueItem.referrer + ':', queueItem.url);
+        grunt.log.error('Resource not found linked from ' + queueItem.referrer.cyan + ' to', queueItem.url.magenta);
       })
       .on('fetcherror', function(queueItem) {
         errors = true;
-        grunt.log.error('Trouble fetching the following resource while at ' + queueItem.referrer + ':', queueItem.url);
+        grunt.log.error('Trouble fetching the following resource linked from ' + queueItem.referrer.cyan + ' to', queueItem.url.magenta);
       })
       .on('fetchtimeout', function(queueItem) {
         errors = true;
-        grunt.log.error('Timeout fetching the following resource while at ' + queueItem.referrer + ':', queueItem.url);
+        grunt.log.error('Timeout fetching the following resource linked from ' + queueItem.referrer.cyan + ' to', queueItem.url.magenta);
       })
       .on('fetchclienterror', function(queueItem) {
-        grunt.log.error('Client error fetching the following resource while at ' + queueItem.referrer + ':', queueItem.url);
+        grunt.log.error('Client error fetching the following resource linked from ' + queueItem.referrer.cyan + ' to', queueItem.url.magenta);
         errors = true;
       })
       .on('complete', function() {
@@ -52,14 +53,20 @@ module.exports = function (grunt) {
         var $ = cheerio.load(html);
 
         $('a[href*="#"]').each(function(i, anchor) {
-          crawler.queueURL($(anchor).attr('href'));
+          crawler.queueURL($(anchor).attr('href'), queueItem);
         });
 
         if (queueItem.url.indexOf('#') !== -1) {
-          if ($(queueItem.url.slice(queueItem.url.indexOf('#'))).length === 0) {
-            grunt.log.error('Error finding content with the following id while at ' + queueItem.url);
+          try {
+            if ($(queueItem.url.slice(queueItem.url.indexOf('#'))).length === 0) {
+              grunt.log.error('Error finding content with the following fragment identifier linked from ' + queueItem.referrer.cyan  + ' to', queueItem.url.magenta);
+              errors = true;
+            }
+          } catch (e) {
+            grunt.log.error('The following URL was formatted incorrectly linked from ' + queueItem.referrer.cyan  + ' to', queueItem.url.magenta);
             errors = true;
           }
+
         }
       });
 
