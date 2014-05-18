@@ -1,0 +1,26 @@
+{
+  "name": "grunt-link-checker",
+  "version": "0.0.0",
+  "description": "Finds broken links and resources on websites",
+  "main": "tasks/link-checker.js",
+  "scripts": {
+    "test": "grunt test"
+  },
+  "keywords": [
+    "grunt",
+    "plugin",
+    "link-checker",
+    "broken",
+    "links",
+    "crawler"
+  ],
+  "author": "Chris Wren",
+  "license": "MIT",
+  "dependencies": {
+    "simplecrawler": "^0.3.8"
+  },
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "matchdep": "^0.3.0"
+  }
+}
