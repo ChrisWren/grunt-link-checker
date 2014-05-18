@@ -13,7 +13,7 @@ module.exports = function (grunt) {
     var done = this.async();
     var options = this.options();
     var errors = false;
-    var Crawler = require("simplecrawler");
+    var Crawler = require('simplecrawler');
     var crawler = new Crawler(this.data.site);
 
     Object.keys(options).forEach(function(key) {
@@ -21,20 +21,20 @@ module.exports = function (grunt) {
     });
 
     crawler
-        .on("fetch404",function(queueItem, response) {
+        .on('fetch404',function(queueItem) {
           errors = true;
-          grunt.log.error("Resource not found while at " + queueItem.referrer + ":", queueItem.url);
+          grunt.log.error('Resource not found while at ' + queueItem.referrer + ':', queueItem.url);
         })
-        .on('fetcherror', function(queueItem, response) {
+        .on('fetcherror', function(queueItem) {
           errors = true;
-          grunt.log.error("Trouble fetching the following resource while at " + queueItem.referrer + ":", queueItem.url);
+          grunt.log.error('Trouble fetching the following resource while at ' + queueItem.referrer + ':', queueItem.url);
         })
-        .on('fetchtimeout', function(queueItem, response) {
+        .on('fetchtimeout', function(queueItem) {
           errors = true;
-          grunt.log.error("Timeout fetching the following resource while at " + queueItem.referrer + ":", queueItem.url);
+          grunt.log.error('Timeout fetching the following resource while at ' + queueItem.referrer + ':', queueItem.url);
         })
-        .on('fetchclienterror', function(queueItem, response) {
-          grunt.log.error("Client error fetching the following resource while at " + queueItem.referrer + ":", queueItem.url);
+        .on('fetchclienterror', function(queueItem) {
+          grunt.log.error('Client error fetching the following resource while at ' + queueItem.referrer + ':', queueItem.url);
           errors = true;
         })
         .on('complete', function() {
