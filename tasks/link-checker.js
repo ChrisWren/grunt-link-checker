@@ -49,6 +49,9 @@ module.exports = function (grunt) {
       })
       .on('fetchcomplete', function(queueItem, responseBuffer) {
         grunt.log.debug('Fetched: ' + queueItem.url);
+        if (options.noFragment) {
+          return;
+        }
         var html = responseBuffer.toString();
         var $ = cheerio.load(html);
 

@@ -29,8 +29,13 @@ The minimal usage of grunt-link-checker runs with a `site` specified:
 }
 ```
 
-### Using options
+### Custom options
 
+#### noFragment
+Type: `Boolean` Default: `false`
+Set this to true to speed up your test by not verfiying fragments.
+
+### simple-crawler options
 Every option specified in the node-simplecrawler is available:
 
 https://github.com/cgiffard/node-simplecrawler#configuring-the-crawler
