@@ -42,6 +42,8 @@ https://github.com/cgiffard/node-simplecrawler#configuring-the-crawler
 
 ## Changelog
 
+**0.0.2** - Added `noFragment` flag.
+
 **0.0.1** - Check to make sure `#` URLs resolve to content with a corresponding id.
 
 **0.0.0** - Initial release
