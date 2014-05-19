@@ -38,7 +38,7 @@ module.exports = function (grunt) {
         grunt.log.error('Timeout fetching the following resource linked from ' + queueItem.referrer.cyan + ' to', queueItem.url.magenta);
       })
       .on('fetchclienterror', function(queueItem) {
-        grunt.log.error('Client error fetching the following resource linked from ' + queueItem.referrer.cyan + ' to', queueItem.url.magenta);
+        grunt.log.error('Client error fetching the following resource linked from ' + queueItem.referrer ? queueItem.referrer.cyan : site + ' to', queueItem.url.magenta);
         errors = true;
       })
       .on('complete', function() {
@@ -69,7 +69,6 @@ module.exports = function (grunt) {
             grunt.log.error('The following URL was formatted incorrectly linked from ' + queueItem.referrer.cyan  + ' to', queueItem.url.magenta);
             errors = true;
           }
-
         }
       });
 
