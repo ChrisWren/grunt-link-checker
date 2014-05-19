@@ -1,6 +1,6 @@
 {
   "name": "grunt-link-checker",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Finds broken links and resources on websites",
   "main": "tasks/link-checker.js",
   "scripts": {
