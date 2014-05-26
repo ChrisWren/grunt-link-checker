@@ -15,6 +15,13 @@
     "links",
     "crawler"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/chriswren/grunt-link-checker.git"
+  },
+  "bugs": {
+    "url": "https://github.com/chriswren/grunt-link-checker/issues"
+  },
   "author": "Chris Wren",
   "license": "MIT",
   "dependencies": {
