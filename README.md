@@ -1,6 +1,6 @@
 # grunt-link-checker
 
-> Run [node-simple-crawler](https://github.com/cgiffard/node-simplecrawler) to discover broken links on your website
+> Run [node-simple-crawler](https://github.com/cgiffard/node-simplecrawler) to discover broken links on your website.
 
 [![NPM version](https://badge.fury.io/js/grunt-link-checker.png)](http://badge.fury.io/js/grunt-link-checker) [![Dependency Status](https://david-dm.org/ChrisWren/grunt-link-checker.png)](https://david-dm.org/ChrisWren/grunt-link-checker) [![Travis Status](https://travis-ci.org/ChrisWren/grunt-link-checker.png)](https://travis-ci.org/ChrisWren/grunt-link-checker)
 
@@ -17,6 +17,8 @@ grunt.loadNpmTasks('grunt-link-checker');
 ```
 
 ## Documentation
+
+grunt-link-checker will by default find any broken internal links on the given `site` and will also find broken fragment identifiers by using [cheerio](https://github.com/cheeriojs/cheerio) to ensure that an element exists with the given identifier. You can figure more [options that are available via node-simplecrawler](https://github.com/cgiffard/node-simplecrawler#configuring-the-crawler).
 
 ### Minimal Usage
 The minimal usage of grunt-link-checker runs with a `site` specified:
