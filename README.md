@@ -38,12 +38,19 @@ Type: `Boolean` Default: `false`
 
 Set this to `true` to speed up your test by not verfiying [fragment identifiers](http://en.wikipedia.org/wiki/Fragment_identifier).
 
+#### callback
+Type: `Function`
+
+Function that receives the instantiated `crawler` object so that you can add [events](https://github.com/cgiffard/node-simplecrawler#events) or other listeners/config to the crawler.
+
 ### simple-crawler options
 Every option specified in the node-simplecrawler is available:
 
 https://github.com/cgiffard/node-simplecrawler#configuring-the-crawler
 
 ## Changelog
+
+**0.0.4** - Added `callback` option.
 
 **0.0.3** - Fixed repo link in package.json and fixed error reporting for a failed initial URL.
 
