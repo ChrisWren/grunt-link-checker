@@ -71,7 +71,7 @@ module.exports = function (grunt) {
           }
         }
       });
-
+    if (options.callback) options.callback(crawler);
     crawler.start();
   });
 };
