@@ -53,6 +53,8 @@ https://github.com/cgiffard/node-simplecrawler#configuring-the-crawler
 
 ## Changelog
 
+**0.0.5** - Added error reporting if initial `site` URL fails.
+
 **0.0.4** - Added `callback` option.
 
 **0.0.3** - Fixed repo link in package.json and fixed error reporting for a failed initial URL.
