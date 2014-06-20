@@ -38,8 +38,11 @@ module.exports = function (grunt) {
         grunt.log.error('Timeout fetching the following resource linked from ' + queueItem.referrer.cyan + ' to', queueItem.url.magenta);
       })
       .on('fetchclienterror', function(queueItem) {
-        grunt.log.error('Client error fetching the following resource linked from ' + queueItem.referrer ? queueItem.referrer.cyan : site + ' to', queueItem.url.magenta);
         errors = true;
+        if (!queueItem.referrer) {
+          return grunt.log.error('Error fetching `site` URL: ' + queueItem.url.magenta);
+        }
+        grunt.log.error('Client error fetching the following resource linked from ' + queueItem.referrer ? queueItem.referrer.cyan : site + ' to', queueItem.url.magenta);
       })
       .on('complete', function() {
         if (!errors) {
