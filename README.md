@@ -77,7 +77,7 @@ Here is an example config using the `callback` option to ignore `localhost` link
       initialPort: 9001,
       callback: function(crawler) {
         crawler.addFetchCondition(function(url) {
-            return url.port === '4001';
+            return url.port === '9001';
         });
       }
     }
