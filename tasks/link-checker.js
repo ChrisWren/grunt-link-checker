@@ -26,13 +26,15 @@ module.exports = function (grunt) {
       crawler[key] = options[key];
     });
     crawler
-      .on('fetch404',function(queueItem) {
+      .on('fetch404',function(queueItem, response) {
         errors = true;
         grunt.log.error('Resource not found linked from ' + queueItem.referrer.cyan + ' to', queueItem.url.magenta);
+        grunt.log.error('Status code: ' + response.statusCode);
       })
-      .on('fetcherror', function(queueItem) {
+      .on('fetcherror', function(queueItem, response) {
         errors = true;
         grunt.log.error('Trouble fetching the following resource linked from ' + queueItem.referrer.cyan + ' to', queueItem.url.magenta);
+        grunt.log.error('Status code: ' + response.statusCode);
       })
       .on('fetchtimeout', function(queueItem) {
         errors = true;
