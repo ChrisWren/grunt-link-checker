@@ -19,6 +19,7 @@ module.exports = function (grunt) {
     var errors = false;
     var site = this.data.site;
 
+    grunt.log.ok('Checking for broken links at: ' + site + (options.initialPort ? ':' + options.initialPort : ''));
     var crawler = new Crawler(site);
 
     Object.keys(options).forEach(function(key) {
@@ -46,7 +47,7 @@ module.exports = function (grunt) {
       })
       .on('complete', function() {
         if (!errors) {
-          grunt.log.ok('No broken links found at: ' + site);
+          grunt.log.ok('No broken links found at: ' + site + (options.initialPort ? ':' + options.initialPort : ''));
         }
         done(!errors);
       })
