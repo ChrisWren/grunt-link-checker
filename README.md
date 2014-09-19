@@ -18,7 +18,7 @@ grunt.loadNpmTasks('grunt-link-checker');
 
 ## Documentation
 
-grunt-link-checker will by default find any broken internal links on the given `site` and will also find broken [fragment identifiers](en.wikipedia.org/wiki/Fragment_identifier) by using [cheerio](https://github.com/cheeriojs/cheerio) to ensure that an element exists with the given identifier. You can figure more [options that are available via node-simplecrawler](https://github.com/cgiffard/node-simplecrawler#configuring-the-crawler).
+grunt-link-checker will by default find any broken internal links on the given `site` and will also find broken [fragment identifiers] by using [cheerio](https://github.com/cheeriojs/cheerio) to ensure that an element exists with the given identifier. You can figure more [options that are available via node-simplecrawler](https://github.com/cgiffard/node-simplecrawler#configuring-the-crawler).
 
 ### Minimal Usage
 The minimal usage of grunt-link-checker runs with a `site` specified and an optional `options.initialPort`:
@@ -60,7 +60,7 @@ In addition to the above config which tests a local version of your site before 
 #### noFragment
 Type: `Boolean` Default: `false`
 
-Set this to `true` to speed up your test by not verfiying [fragment identifiers](http://en.wikipedia.org/wiki/Fragment_identifier).
+Set this to `true` to speed up your test by not verfiying [fragment identifiers].
 
 #### callback
 Type: `Function`
@@ -104,3 +104,5 @@ https://github.com/cgiffard/node-simplecrawler#configuring-the-crawler
 **0.0.1** - Check to make sure `#` URLs resolve to content with a corresponding id.
 
 **0.0.0** - Initial release
+
+[fragment identifiers]: http://en.wikipedia.org/wiki/Fragment_identifier
