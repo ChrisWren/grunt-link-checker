@@ -1,13 +1,11 @@
 # Reporting issues
 
-If you are reporting an issue here, please make sure that the issue is with grunt-nodemon and not nodemon. If you have discovered a bug in nodemon, please file an issue [there](https://github.com/remy/nodemon/issues/new).
+If you are reporting an issue here, please make sure that the issue is with grunt-link-checker and not node-simplecrawler. If you have discovered a bug in node-simplecrawler, please file an issue [there](https://github.com/cgiffard/node-simplecrawler/issues/new).
 
 # Tests
 
- We use the [mocha](http://visionmedia.github.io/mocha/) test framework and [should](https://github.com/visionmedia/should.js/) assertion library to test grunt-pages. To run the test suite, enter the following command:
+To lint the JavaScript and test the link-checker, run the following command:
 
 ```bash
 grunt test
 ```
-
-There are integration tests located in [this](https://github.com/ChrisWren/grunt-nodemon/blob/master/test/integrationTests.js) file which verify that the .nodemonignore file is created/removed as expected.
