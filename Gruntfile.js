@@ -1,5 +1,8 @@
+'use strict';
+
 module.exports = function (grunt) {
   require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
+
   grunt.initConfig({
     'link-checker': {
       all: {
@@ -9,7 +12,7 @@ module.exports = function (grunt) {
         }
       }
     },
-    mdlint: ['README.md'],
+
     jshint: {
       options: {
         jshintrc: true
@@ -18,6 +21,7 @@ module.exports = function (grunt) {
         src: ['Gruntfile.js', 'tasks/*.js']
       }
     },
+
     connect: {
       server: {
         options: {
@@ -26,9 +30,10 @@ module.exports = function (grunt) {
         }
       }
     }
+
   });
 
-  grunt.registerTask('default', ['link-checker']);
+  grunt.registerTask('default', 'link-checker');
   grunt.registerTask('test', ['jshint', 'connect', 'link-checker']);
   grunt.loadTasks('tasks');
 

@@ -6,12 +6,13 @@
  * Licensed under the MIT license.
  */
 
+'use strict';
+
 var Crawler = require('simplecrawler');
 var cheerio = require('cheerio');
 require('colors');
 
 module.exports = function (grunt) {
-  'use strict';
   grunt.registerMultiTask('link-checker', 'Checks your site for broken links after a build.', function () {
 
     var done = this.async();
@@ -26,7 +27,7 @@ module.exports = function (grunt) {
       crawler[key] = options[key];
     });
     crawler
-      .on('fetch404',function(queueItem, response) {
+      .on('fetch404', function(queueItem, response) {
         errors = true;
         grunt.log.error('Resource not found linked from ' + queueItem.referrer.cyan + ' to', queueItem.url.magenta);
         grunt.log.error('Status code: ' + response.statusCode);
@@ -68,16 +69,18 @@ module.exports = function (grunt) {
         if (queueItem.url.indexOf('#') !== -1) {
           try {
             if ($(queueItem.url.slice(queueItem.url.indexOf('#'))).length === 0) {
-              grunt.log.error('Error finding content with the following fragment identifier linked from ' + queueItem.referrer.cyan  + ' to', queueItem.url.magenta);
+              grunt.log.error('Error finding content with the following fragment identifier linked from ' + queueItem.referrer.cyan + ' to', queueItem.url.magenta);
               errors = true;
             }
           } catch (e) {
-            grunt.log.error('The following URL was formatted incorrectly linked from ' + queueItem.referrer.cyan  + ' to', queueItem.url.magenta);
+            grunt.log.error('The following URL was formatted incorrectly linked from ' + queueItem.referrer.cyan + ' to', queueItem.url.magenta);
             errors = true;
           }
         }
       });
-    if (options.callback) options.callback(crawler);
+    if (options.callback) {
+        options.callback(crawler);
+    }
     crawler.start();
   });
 };
