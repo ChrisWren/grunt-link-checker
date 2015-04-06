@@ -15,7 +15,7 @@ module.exports = function (grunt) {
         jshintrc: true
       },
       files: {
-        src: ['*.js', 'tasks/*.js']
+        src: ['Gruntfile.js', 'tasks/*.js']
       }
     },
     connect: {
