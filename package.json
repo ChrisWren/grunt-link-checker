@@ -1,7 +1,17 @@
 {
   "name": "grunt-link-checker",
+  "author": "Chris Wren",
   "version": "0.0.6",
+  "homepage": "https://github.com/chriswren/grunt-link-checker",
   "description": "Finds broken links and resources on websites",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chriswren/grunt-link-checker.git"
+  },
+  "bugs": {
+    "url": "https://github.com/chriswren/grunt-link-checker/issues"
+  },
+  "license": "MIT",
   "main": "tasks/link-checker.js",
   "scripts": {
     "test": "grunt test"
@@ -15,25 +25,23 @@
     "links",
     "crawler"
   ],
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/chriswren/grunt-link-checker.git"
-  },
-  "bugs": {
-    "url": "https://github.com/chriswren/grunt-link-checker/issues"
-  },
-  "author": "Chris Wren",
-  "license": "MIT",
   "dependencies": {
-    "cheerio": "^0.16.0",
-    "colors": "^0.6.2",
-    "simplecrawler": "^0.3.8"
+    "cheerio": "^0.19.0",
+    "colors": "^1.0.3",
+    "simplecrawler": "^0.3.10"
   },
   "devDependencies": {
     "grunt": "^0.4.5",
-    "grunt-contrib-connect": "^0.7.1",
-    "grunt-contrib-jshint": "^0.10.0",
-    "grunt-release": "^0.7.0",
+    "grunt-contrib-connect": "^0.10.1",
+    "grunt-contrib-jshint": "^0.11.1",
+    "grunt-release": "^0.12.0",
     "matchdep": "^0.3.0"
-  }
+  },
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "files": [
+    "tasks",
+    "LICENSE"
+  ]
 }
