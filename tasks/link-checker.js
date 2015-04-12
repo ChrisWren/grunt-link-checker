@@ -13,7 +13,7 @@ var cheerio = require('cheerio');
 var chalk = require('chalk');
 
 module.exports = function (grunt) {
-  grunt.registerMultiTask('link-checker', 'Checks your site for broken links after a build.', function () {
+  grunt.registerMultiTask('linkChecker', 'Checks your site for broken links after a build.', function () {
 
     var done = this.async();
     var options = this.options();

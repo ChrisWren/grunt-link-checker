@@ -6,7 +6,7 @@ module.exports = function (grunt) {
   require('time-grunt')(grunt);
 
   grunt.initConfig({
-    'link-checker': {
+    linkChecker: {
       all: {
         site: 'localhost',
         options: {
@@ -27,7 +27,7 @@ module.exports = function (grunt) {
     connect: {
       server: {
         options: {
-          port: 9001,
+          port: '<%= linkChecker.all.options.initialPort %>',
           base: 'test/fixtures'
         }
       }
@@ -35,8 +35,8 @@ module.exports = function (grunt) {
 
   });
 
-  grunt.registerTask('default', 'link-checker');
-  grunt.registerTask('test', ['jshint', 'connect', 'link-checker']);
+  grunt.registerTask('default', 'linkChecker');
+  grunt.registerTask('test', ['jshint', 'connect', 'linkChecker']);
   grunt.loadTasks('tasks');
 
 };
