@@ -10,7 +10,7 @@
 
 var Crawler = require('simplecrawler');
 var cheerio = require('cheerio');
-require('colors');
+var chalk = require('chalk');
 
 module.exports = function (grunt) {
   grunt.registerMultiTask('link-checker', 'Checks your site for broken links after a build.', function () {
@@ -29,24 +29,24 @@ module.exports = function (grunt) {
     crawler
       .on('fetch404', function(queueItem, response) {
         errors = true;
-        grunt.log.error('Resource not found linked from ' + queueItem.referrer.cyan + ' to', queueItem.url.magenta);
+        grunt.log.error('Resource not found linked from ' + chalk.cyan(queueItem.referrer) + ' to', chalk.magenta(queueItem.url));
         grunt.log.error('Status code: ' + response.statusCode);
       })
       .on('fetcherror', function(queueItem, response) {
         errors = true;
-        grunt.log.error('Trouble fetching the following resource linked from ' + queueItem.referrer.cyan + ' to', queueItem.url.magenta);
+        grunt.log.error('Trouble fetching the following resource linked from ' + chalk.cyan(queueItem.referrer) + ' to', chalk.magenta(queueItem.url));
         grunt.log.error('Status code: ' + response.statusCode);
       })
       .on('fetchtimeout', function(queueItem) {
         errors = true;
-        grunt.log.error('Timeout fetching the following resource linked from ' + queueItem.referrer.cyan + ' to', queueItem.url.magenta);
+        grunt.log.error('Timeout fetching the following resource linked from ' + chalk.cyan(queueItem.referrer) + ' to', chalk.magenta(queueItem.url));
       })
       .on('fetchclienterror', function(queueItem) {
         errors = true;
         if (!queueItem.referrer) {
-          return grunt.log.error('Error fetching `site` URL: ' + queueItem.url.magenta);
+          return grunt.log.error('Error fetching `site` URL: ' + chalk.magenta(queueItem.url));
         }
-        grunt.log.error('Client error fetching the following resource linked from ' + queueItem.referrer ? queueItem.referrer.cyan : site + ' to', queueItem.url.magenta);
+        grunt.log.error('Client error fetching the following resource linked from ' + queueItem.referrer ? chalk.cyan(queueItem.referrer) : site + ' to', chalk.magenta(queueItem.url));
       })
       .on('complete', function() {
         if (!errors) {
@@ -69,11 +69,11 @@ module.exports = function (grunt) {
         if (queueItem.url.indexOf('#') !== -1) {
           try {
             if ($(queueItem.url.slice(queueItem.url.indexOf('#'))).length === 0) {
-              grunt.log.error('Error finding content with the following fragment identifier linked from ' + queueItem.referrer.cyan + ' to', queueItem.url.magenta);
+              grunt.log.error('Error finding content with the following fragment identifier linked from ' + chalk.cyan(queueItem.referrer) + ' to', chalk.magenta(queueItem.url));
               errors = true;
             }
           } catch (e) {
-            grunt.log.error('The following URL was formatted incorrectly linked from ' + queueItem.referrer.cyan + ' to', queueItem.url.magenta);
+            grunt.log.error('The following URL was formatted incorrectly linked from ' + chalk.cyan(queueItem.referrer) + ' to', chalk.magenta(queueItem.url));
             errors = true;
           }
         }
