@@ -97,6 +97,7 @@ https://github.com/cgiffard/node-simplecrawler#configuring-the-crawler
 
 ## Changelog
 
+* **0.1.0** - Updated dependencies, changed task name to `linkChecker`.
 * **0.0.6** - Added logging for initially fetched URL and logged status codes for failed fetches.
 * **0.0.5** - Added error reporting if initial `site` URL fails.
 * **0.0.4** - Added `callback` option.
