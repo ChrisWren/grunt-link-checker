@@ -28,7 +28,7 @@ grunt-link-checker will by default find any broken internal links on the given `
 The minimal usage of grunt-link-checker runs with a `site` specified and an optional `options.initialPort`:
 
 ```js
-'link-checker': {
+linkChecker: {
   dev: {
     site: 'localhost',
     options: {
@@ -42,7 +42,7 @@ The minimal usage of grunt-link-checker runs with a `site` specified and an opti
 In addition to the above config which tests a local version of your site before deployment, you can add an additional target to run post-deployment. This will verify that your assets were deployed correctly and are being resolved correctly after any revisioning or path modifications during deployment:
 
 ```js
-'link-checker': {
+linkChecker: {
   // Use a large amount of concurrency to speed up check
   options: {
     maxConcurrency: 20
@@ -75,7 +75,7 @@ Function that receives the instantiated `crawler` object so that you can add [ev
 Here is an example config using the `callback` option to ignore `localhost` links which have different ports:
 
 ```js
-'link-checker': {
+linkChecker: {
   dev: {
     site: 'localhost',
     options: {
