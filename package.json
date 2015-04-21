@@ -1,7 +1,7 @@
 {
   "name": "grunt-link-checker",
   "author": "Chris Wren",
-  "version": "0.0.6",
+  "version": "0.1.0",
   "homepage": "https://github.com/chriswren/grunt-link-checker",
   "description": "Finds broken links and resources on websites",
   "repository": {
