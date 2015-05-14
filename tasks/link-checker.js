@@ -18,9 +18,10 @@ module.exports = function (grunt) {
     var done = this.async();
     var options = this.options();
     var errors = false;
-    var site = this.data.site;
+    var site = this.data.site || options.site || 'localhost';
+    var port = options.initialPort || 9001;
 
-    grunt.log.ok('Checking for broken links at: ' + site + (options.initialPort ? ':' + options.initialPort : ''));
+    grunt.log.ok('Checking for broken links at: ' + site + ':' + port);
     var crawler = new Crawler(site);
 
     Object.keys(options).forEach(function(key) {
@@ -50,7 +51,7 @@ module.exports = function (grunt) {
       })
       .on('complete', function() {
         if (!errors) {
-          grunt.log.ok('No broken links found at: ' + site + (options.initialPort ? ':' + options.initialPort : ''));
+          grunt.log.ok('No broken links found at: ' + site + ':' + port);
         }
         done(!errors);
       })
@@ -79,7 +80,7 @@ module.exports = function (grunt) {
         }
       });
     if (options.callback) {
-        options.callback(crawler);
+      options.callback(crawler);
     }
     crawler.start();
   });
