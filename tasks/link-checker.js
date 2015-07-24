@@ -11,14 +11,41 @@
 var Crawler = require('simplecrawler');
 var cheerio = require('cheerio');
 var chalk = require('chalk');
+var fs = require('fs');
+var mkdirpSync = require('mkdirp').sync;
+var path = require('path');
 
-module.exports = function (grunt) {
-  grunt.registerMultiTask('linkChecker', 'Checks your site for broken links after a build.', function () {
+var capture = function(captureFile, content) {
+  var file;
+  try {
+    mkdirpSync(path.dirname(captureFile));
+    file = fs.openSync(captureFile, 'w');
+    if (file) {
+      fs.writeSync(file, JSON.stringify(content, null, 2));
+    }
+    // close the file if it was opened
+  } finally {
+    if (file) {
+      fs.closeSync(file);
+    }
+  }
+};
+
+module.exports = function(grunt) {
+  grunt.registerMultiTask('linkChecker', 'Checks your site for broken links after a build.', function() {
 
     var done = this.async();
     var options = this.options();
     var errors = false;
     var site = this.data.site;
+    var result = {
+      stats: {
+        tests: 0,
+        passes: 0,
+        failures: 0,
+      },
+      failures: []
+    };
 
     grunt.log.ok('Checking for broken links at: ' + site + (options.initialPort ? ':' + options.initialPort : ''));
     var crawler = new Crawler(site);
@@ -28,20 +55,48 @@ module.exports = function (grunt) {
     });
     crawler
       .on('fetch404', function(queueItem, response) {
+        result.stats.tests++;
+        result.stats.failures++;
+        result.failures.push({
+          title: queueItem.url,
+          fullTitle: queueItem.referrer + ' -> ' + queueItem.url,
+          error: response.statusCode
+        });
         errors = true;
         grunt.log.error('Resource not found linked from ' + chalk.cyan(queueItem.referrer) + ' to', chalk.magenta(queueItem.url));
         grunt.log.error('Status code: ' + response.statusCode);
       })
       .on('fetcherror', function(queueItem, response) {
+        result.stats.tests++;
+        result.stats.failures++;
+        result.failures.push({
+          title: queueItem.url,
+          fullTitle: queueItem.referrer + ' -> ' + queueItem.url,
+          error: response.statusCode
+        });
         errors = true;
         grunt.log.error('Trouble fetching the following resource linked from ' + chalk.cyan(queueItem.referrer) + ' to', chalk.magenta(queueItem.url));
         grunt.log.error('Status code: ' + response.statusCode);
       })
       .on('fetchtimeout', function(queueItem) {
+        result.stats.tests++;
+        result.stats.failures++;
+        result.failures.push({
+          title: queueItem.url,
+          fullTitle: queueItem.referrer + ' -> ' + queueItem.url,
+          error: 'Request timeout'
+        });
         errors = true;
         grunt.log.error('Timeout fetching the following resource linked from ' + chalk.cyan(queueItem.referrer) + ' to', chalk.magenta(queueItem.url));
       })
       .on('fetchclienterror', function(queueItem) {
+        result.stats.tests++;
+        result.stats.failures++;
+        result.failures.push({
+          title: queueItem.url,
+          fullTitle: queueItem.referrer + ' -> ' + queueItem.url,
+          error: 'Error fetching from ' + queueItem.referrer + ' to ' + queueItem.url
+        });
         errors = true;
         if (!queueItem.referrer) {
           return grunt.log.error('Error fetching `site` URL: ' + chalk.magenta(queueItem.url));
@@ -49,12 +104,20 @@ module.exports = function (grunt) {
         grunt.log.error('Client error fetching the following resource linked from ' + queueItem.referrer ? chalk.cyan(queueItem.referrer) : site + ' to', chalk.magenta(queueItem.url));
       })
       .on('complete', function() {
+        result.stats.end = new Date().getTime();
+        result.stats.duration = (result.stats.end - result.stats.start) / 1000;
         if (!errors) {
           grunt.log.ok('No broken links found at: ' + site + (options.initialPort ? ':' + options.initialPort : ''));
+        }
+        // Record json result in a file
+        if (options.resultFile) {
+          capture(options.resultFile, result);
         }
         done(!errors);
       })
       .on('fetchcomplete', function(queueItem, responseBuffer) {
+        result.stats.tests++;
+        result.stats.passes++;
         grunt.log.debug('Fetched: ' + queueItem.url);
         if (options.noFragment) {
           return;
@@ -79,8 +142,9 @@ module.exports = function (grunt) {
         }
       });
     if (options.callback) {
-        options.callback(crawler);
+      options.callback(crawler);
     }
+    result.stats.start = new Date().getTime();
     crawler.start();
   });
 };

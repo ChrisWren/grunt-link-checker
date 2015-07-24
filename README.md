@@ -90,6 +90,11 @@ linkChecker: {
 }
 ```
 
+#### resultFile
+Type: `String`
+
+Set the output file you want to save result to. The result is json formatted.
+
 ### simple-crawler options
 Every option specified in the node-simplecrawler is available:
 
