@@ -43,9 +43,12 @@ module.exports = function(grunt) {
         tests: 0,
         passes: 0,
         failures: 0,
+        pending: 0
       },
+      tests: [],
       failures: []
     };
+    var startTime;
 
     grunt.log.ok('Checking for broken links at: ' + site + (options.initialPort ? ':' + options.initialPort : ''));
     var crawler = new Crawler(site);
@@ -55,47 +58,51 @@ module.exports = function(grunt) {
     });
     crawler
       .on('fetch404', function(queueItem, response) {
-        result.stats.tests++;
-        result.stats.failures++;
         result.failures.push({
           title: queueItem.url,
           fullTitle: queueItem.referrer + ' -> ' + queueItem.url,
-          error: response.statusCode
+          duration: (new Date().getTime() - startTime),
+          err: {
+            stack: 'Status code: ' + response.statusCode
+          }
         });
         errors = true;
         grunt.log.error('Resource not found linked from ' + chalk.cyan(queueItem.referrer) + ' to', chalk.magenta(queueItem.url));
         grunt.log.error('Status code: ' + response.statusCode);
       })
       .on('fetcherror', function(queueItem, response) {
-        result.stats.tests++;
-        result.stats.failures++;
         result.failures.push({
           title: queueItem.url,
           fullTitle: queueItem.referrer + ' -> ' + queueItem.url,
-          error: response.statusCode
+          duration: (new Date().getTime() - startTime),
+          err: {
+            stack: 'Status code: ' + response.statusCode
+          }
         });
         errors = true;
         grunt.log.error('Trouble fetching the following resource linked from ' + chalk.cyan(queueItem.referrer) + ' to', chalk.magenta(queueItem.url));
         grunt.log.error('Status code: ' + response.statusCode);
       })
       .on('fetchtimeout', function(queueItem) {
-        result.stats.tests++;
-        result.stats.failures++;
         result.failures.push({
           title: queueItem.url,
           fullTitle: queueItem.referrer + ' -> ' + queueItem.url,
-          error: 'Request timeout'
+          duration: (new Date().getTime() - startTime),
+          err: {
+            stack: 'Request timeout'
+          }
         });
         errors = true;
         grunt.log.error('Timeout fetching the following resource linked from ' + chalk.cyan(queueItem.referrer) + ' to', chalk.magenta(queueItem.url));
       })
       .on('fetchclienterror', function(queueItem) {
-        result.stats.tests++;
-        result.stats.failures++;
         result.failures.push({
           title: queueItem.url,
           fullTitle: queueItem.referrer + ' -> ' + queueItem.url,
-          error: 'Error fetching from ' + queueItem.referrer + ' to ' + queueItem.url
+          duration: (new Date().getTime() - startTime),
+          err: {
+            stack: 'Error fetching from ' + queueItem.referrer + ' to ' + queueItem.url
+          }
         });
         errors = true;
         if (!queueItem.referrer) {
@@ -104,8 +111,10 @@ module.exports = function(grunt) {
         grunt.log.error('Client error fetching the following resource linked from ' + queueItem.referrer ? chalk.cyan(queueItem.referrer) : site + ' to', chalk.magenta(queueItem.url));
       })
       .on('complete', function() {
+        result.stats.failures = result.failures.length;
+        result.tests = result.failures;
         result.stats.end = new Date().getTime();
-        result.stats.duration = (result.stats.end - result.stats.start) / 1000;
+        result.stats.duration = result.stats.end - result.stats.start;
         if (!errors) {
           grunt.log.ok('No broken links found at: ' + site + (options.initialPort ? ':' + options.initialPort : ''));
         }
@@ -116,7 +125,6 @@ module.exports = function(grunt) {
         done(!errors);
       })
       .on('fetchcomplete', function(queueItem, responseBuffer) {
-        result.stats.tests++;
         result.stats.passes++;
         grunt.log.debug('Fetched: ' + queueItem.url);
         if (options.noFragment) {
@@ -140,6 +148,35 @@ module.exports = function(grunt) {
             errors = true;
           }
         }
+      })
+      .on('fetchstart', function() {
+        result.stats.tests++;
+        startTime = new Date().getTime();
+      })
+      .on('queueerror', function(errorData, URLData) {
+        result.failures.push({
+          title: URLData,
+          fullTitle: URLData,
+          duration: (new Date().getTime() - startTime),
+          err: {
+            stack: errorData
+          }
+        });
+        grunt.log.error('Queue error happened for url: ' + URLData);
+      })
+      .on('fetchdataerror', function(queueItem) {
+        result.failures.push({
+          title: queueItem.url,
+          fullTitle: queueItem.referrer + ' -> ' + queueItem.url,
+          duration: (new Date().getTime() - startTime),
+          err: {
+            stack: 'Resource exceeds max size (16MB)'
+          }
+        });
+        grunt.log.error('Resource exceeds max size (16MB): ' + queueItem.referrer + ' -> ' + queueItem.url);
+      })
+      .on('fetchredirect', function(queueItem, parsedURL) {
+        result.stats.passes++;
       });
     if (options.callback) {
       options.callback(crawler);
