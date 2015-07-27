@@ -14,21 +14,68 @@ var chalk = require('chalk');
 var fs = require('fs');
 var mkdirpSync = require('mkdirp').sync;
 var path = require('path');
+var _ = require('underscore');
+var xmlWriter = require('libxmljs');
 
-var capture = function(captureFile, content) {
+var capture = function(captureFiles, content) {
+  var files = _.pick(captureFiles, ['json', 'xml']);
   var file;
-  try {
-    mkdirpSync(path.dirname(captureFile));
-    file = fs.openSync(captureFile, 'w');
-    if (file) {
-      fs.writeSync(file, JSON.stringify(content, null, 2));
+  _.each(files, function(value, key) {
+    try {
+      mkdirpSync(path.dirname(value));
+      file = fs.openSync(value, 'w');
+      if (file) {
+        switch (key) {
+          case 'json':
+            fs.writeSync(file, JSON.stringify(content, null, 2));
+            break;
+
+          case 'xml':
+            var doc = new xmlWriter.Document();
+            var testsuite = doc.node('testsuite').attr({
+              name: 'Link Checker',
+              tests: content.stats.tests,
+              failures: content.stats.failures,
+              errors: content.stats.failures,
+              skipped: content.stats.pending,
+              timestamp: content.stats.start,
+              time: content.stats.duration / 1000
+            });
+            _.each(content.tests, function(test) {
+              if (test.err) {
+                testsuite.node('testcase').attr({
+                  classname: test.title,
+                  name: test.fullTitle,
+                  time: test.duration / 1000,
+                  message: test.err.stack
+                }).node('failure').attr({
+                  classname: test.title,
+                  name: test.fullTitle,
+                  time: test.duration / 1000,
+                  message: test.err.stack
+                });
+              } else {
+                testsuite.node('testcase').attr({
+                  classname: test.title,
+                  name: test.fullTitle,
+                  time: test.duration / 1000
+                });
+              }
+            });
+            fs.writeSync(file, doc.toString());
+            break;
+
+          default:
+            break;
+        }
+      }
+    } finally {
+      // close the file if it was opened
+      if (file) {
+        fs.closeSync(file);
+      }
     }
-    // close the file if it was opened
-  } finally {
-    if (file) {
-      fs.closeSync(file);
-    }
-  }
+  });
 };
 
 module.exports = function(grunt) {
@@ -46,7 +93,8 @@ module.exports = function(grunt) {
         pending: 0
       },
       tests: [],
-      failures: []
+      failures: [],
+      passes: []
     };
     var startTime;
 
@@ -58,7 +106,7 @@ module.exports = function(grunt) {
     });
     crawler
       .on('fetch404', function(queueItem, response) {
-        result.failures.push({
+        result.tests.push({
           title: queueItem.url,
           fullTitle: queueItem.referrer + ' -> ' + queueItem.url,
           duration: (new Date().getTime() - startTime),
@@ -71,7 +119,7 @@ module.exports = function(grunt) {
         grunt.log.error('Status code: ' + response.statusCode);
       })
       .on('fetcherror', function(queueItem, response) {
-        result.failures.push({
+        result.tests.push({
           title: queueItem.url,
           fullTitle: queueItem.referrer + ' -> ' + queueItem.url,
           duration: (new Date().getTime() - startTime),
@@ -84,7 +132,7 @@ module.exports = function(grunt) {
         grunt.log.error('Status code: ' + response.statusCode);
       })
       .on('fetchtimeout', function(queueItem) {
-        result.failures.push({
+        result.tests.push({
           title: queueItem.url,
           fullTitle: queueItem.referrer + ' -> ' + queueItem.url,
           duration: (new Date().getTime() - startTime),
@@ -96,7 +144,7 @@ module.exports = function(grunt) {
         grunt.log.error('Timeout fetching the following resource linked from ' + chalk.cyan(queueItem.referrer) + ' to', chalk.magenta(queueItem.url));
       })
       .on('fetchclienterror', function(queueItem) {
-        result.failures.push({
+        result.tests.push({
           title: queueItem.url,
           fullTitle: queueItem.referrer + ' -> ' + queueItem.url,
           duration: (new Date().getTime() - startTime),
@@ -111,21 +159,32 @@ module.exports = function(grunt) {
         grunt.log.error('Client error fetching the following resource linked from ' + queueItem.referrer ? chalk.cyan(queueItem.referrer) : site + ' to', chalk.magenta(queueItem.url));
       })
       .on('complete', function() {
+        result.stats.tests = result.tests.length;
+        result.failures = _.filter(result.tests, function(test) {
+          return test.err;
+        });
+        result.passes = _.filter(result.tests, function(test) {
+          return !test.err;
+        });
         result.stats.failures = result.failures.length;
-        result.tests = result.failures;
+        result.stats.passes = result.passes.length;
         result.stats.end = new Date().getTime();
         result.stats.duration = result.stats.end - result.stats.start;
         if (!errors) {
           grunt.log.ok('No broken links found at: ' + site + (options.initialPort ? ':' + options.initialPort : ''));
         }
         // Record json result in a file
-        if (options.resultFile) {
-          capture(options.resultFile, result);
+        if (options.resultFiles) {
+          capture(options.resultFiles, result);
         }
         done(!errors);
       })
       .on('fetchcomplete', function(queueItem, responseBuffer) {
-        result.stats.passes++;
+        result.tests.push({
+          title: queueItem.url,
+          fullTitle: queueItem.referrer + ' -> ' + queueItem.url,
+          duration: (new Date().getTime() - startTime)
+        });
         grunt.log.debug('Fetched: ' + queueItem.url);
         if (options.noFragment) {
           return;
@@ -150,11 +209,10 @@ module.exports = function(grunt) {
         }
       })
       .on('fetchstart', function() {
-        result.stats.tests++;
         startTime = new Date().getTime();
       })
       .on('queueerror', function(errorData, URLData) {
-        result.failures.push({
+        result.tests.push({
           title: URLData,
           fullTitle: URLData,
           duration: (new Date().getTime() - startTime),
@@ -165,7 +223,7 @@ module.exports = function(grunt) {
         grunt.log.error('Queue error happened for url: ' + URLData);
       })
       .on('fetchdataerror', function(queueItem) {
-        result.failures.push({
+        result.tests.push({
           title: queueItem.url,
           fullTitle: queueItem.referrer + ' -> ' + queueItem.url,
           duration: (new Date().getTime() - startTime),
@@ -176,7 +234,11 @@ module.exports = function(grunt) {
         grunt.log.error('Resource exceeds max size (16MB): ' + queueItem.referrer + ' -> ' + queueItem.url);
       })
       .on('fetchredirect', function(queueItem, parsedURL) {
-        result.stats.passes++;
+        result.tests.push({
+          title: queueItem.url,
+          fullTitle: queueItem.referrer + ' -> ' + queueItem.url,
+          duration: (new Date().getTime() - startTime)
+        });
       });
     if (options.callback) {
       options.callback(crawler);
