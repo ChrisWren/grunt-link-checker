@@ -90,6 +90,21 @@ linkChecker: {
 }
 ```
 
+#### resultFiles
+Type: `Object`
+
+Give the possibility to generate a report of tests.
+These can be generated as json and / or xml files (compatible with Jenkins)
+
+Here is an example config using the `resultFiles` option:
+
+```js
+resultFiles: {
+  json: "reports/TEST-url-checker.json",
+  xml: "reports/TEST-url-checker.xml"
+}
+```
+
 ### simple-crawler options
 Every option specified in the node-simplecrawler is available:
 
