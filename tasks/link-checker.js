@@ -233,7 +233,7 @@ module.exports = function(grunt) {
         });
         grunt.log.error('Resource exceeds max size (16MB): ' + queueItem.referrer + ' -> ' + queueItem.url);
       })
-      .on('fetchredirect', function(queueItem, parsedURL) {
+      .on('fetchredirect', function(queueItem) {
         result.tests.push({
           title: queueItem.url,
           fullTitle: queueItem.referrer + ' -> ' + queueItem.url,
