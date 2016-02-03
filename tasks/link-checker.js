@@ -68,7 +68,7 @@ module.exports = function (grunt) {
 
         if (queueItem.url.indexOf('#') !== -1) {
           try {
-            if ($(queueItem.url.slice(queueItem.url.indexOf('#'))).length === 0) {
+            if ($('[id="' + queueItem.url.slice(queueItem.url.indexOf('#')+1) + '"]').length === 0) {
               grunt.log.error('Error finding content with the following fragment identifier linked from ' + chalk.cyan(queueItem.referrer) + ' to', chalk.magenta(queueItem.url));
               errors = true;
             }
