@@ -19,6 +19,7 @@ module.exports = function (grunt) {
     var options = this.options();
     var errors = false;
     var site = this.data.site;
+    var dotRE = /\./g;
 
     grunt.log.ok('Checking for broken links at: ' + site + (options.initialPort ? ':' + options.initialPort : ''));
     var crawler = new Crawler(site);
@@ -68,7 +69,7 @@ module.exports = function (grunt) {
 
         if (queueItem.url.indexOf('#') !== -1) {
           try {
-            if ($(queueItem.url.slice(queueItem.url.indexOf('#'))).length === 0) {
+            if ($(queueItem.url.slice(queueItem.url.indexOf('#')).replace(dotRE, '\\.')).length === 0) {
               grunt.log.error('Error finding content with the following fragment identifier linked from ' + chalk.cyan(queueItem.referrer) + ' to', chalk.magenta(queueItem.url));
               errors = true;
             }
