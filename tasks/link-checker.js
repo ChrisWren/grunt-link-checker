@@ -80,7 +80,7 @@ module.exports = function (grunt) {
         }
       });
     if (options.callback) {
-        options.callback(crawler);
+      options.callback(crawler);
     }
     crawler.start();
   });
