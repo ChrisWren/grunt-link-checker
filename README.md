@@ -103,6 +103,7 @@ Every option specified in the node-simplecrawler is available:
 
 ## Changelog
 
+* **0.2.0** - Updated dependencies.
 * **0.1.0** - Updated dependencies, changed task name to `linkChecker`.
 * **0.0.6** - Added logging for initially fetched URL and logged status codes for failed fetches.
 * **0.0.5** - Added error reporting if initial `site` URL fails.
