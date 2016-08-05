@@ -21,6 +21,16 @@ module.exports = function (grunt) {
     var site = this.data.site || options.site;
     var dotRE = /\./g;
 
+    // Borrowed from grunt-contrib-qunit
+    // If options.force then log an error, otherwise exit with a warning
+    var warnUnlessForced = function (message) {
+      if (options.force) {
+        grunt.log.error(message);
+      } else {
+        grunt.warn(message);
+      }
+    };
+
     grunt.log.ok('Checking for broken links at: ' + site + (options.initialPort ? ':' + options.initialPort : ''));
     var crawler = new Crawler(site);
 
@@ -30,31 +40,35 @@ module.exports = function (grunt) {
     crawler
       .on('fetch404', function(queueItem, response) {
         errors = true;
-        grunt.log.error('Resource not found linked from ' + chalk.cyan(queueItem.referrer) + ' to ' + chalk.magenta(queueItem.url));
-        grunt.log.error('Status code: ' + response.statusCode);
+        warnUnlessForced('Resource not found linked from ' + chalk.cyan(queueItem.referrer) + ' to ' + chalk.magenta(queueItem.url));
+        warnUnlessForced('Status code: ' + response.statusCode);
       })
       .on('fetcherror', function(queueItem, response) {
         errors = true;
-        grunt.log.error('Trouble fetching the following resource linked from ' + chalk.cyan(queueItem.referrer) + ' to ' + chalk.magenta(queueItem.url));
-        grunt.log.error('Status code: ' + response.statusCode);
+        warnUnlessForced('Trouble fetching the following resource linked from ' + chalk.cyan(queueItem.referrer) + ' to ' + chalk.magenta(queueItem.url));
+        warnUnlessForced('Status code: ' + response.statusCode);
       })
       .on('fetchtimeout', function(queueItem) {
         errors = true;
-        grunt.log.error('Timeout fetching the following resource linked from ' + chalk.cyan(queueItem.referrer) + ' to ' + chalk.magenta(queueItem.url));
+        warnUnlessForced('Timeout fetching the following resource linked from ' + chalk.cyan(queueItem.referrer) + ' to ' + chalk.magenta(queueItem.url));
       })
       .on('fetchclienterror', function(queueItem) {
         errors = true;
         if (!queueItem.referrer) {
-          grunt.log.error('Error fetching `site` URL: ' + chalk.magenta(queueItem.url));
+          warnUnlessForced('Error fetching `site` URL: ' + chalk.magenta(queueItem.url));
         }
-        grunt.log.error('Client error fetching the following resource linked from ' + queueItem.referrer ? chalk.cyan(queueItem.referrer) : site + ' to ' + chalk.magenta(queueItem.url));
+        warnUnlessForced('Client error fetching the following resource linked from ' + queueItem.referrer ? chalk.cyan(queueItem.referrer) : site + ' to ' + chalk.magenta(queueItem.url));
       })
       .on('fetchredirect', function(queueItem) {
         if (!options.checkRedirect) {
           return;
         }
-        errors = true;
-        grunt.log.error('Redirect detected from ' + chalk.cyan(queueItem.url) + ' to', chalk.magenta(queueItem.stateData.headers.location));
+        if (options.force) {
+          errors = false;
+        } else {
+          errors = true;
+        }
+        warnUnlessForced('Redirect detected from ' + chalk.cyan(queueItem.url) + ' to ' + chalk.magenta(queueItem.stateData.headers.location));
       })
       .on('complete', function() {
         if (!errors) {
@@ -77,11 +91,11 @@ module.exports = function (grunt) {
         if (queueItem.url.indexOf('#') !== -1) {
           try {
             if ($(queueItem.url.slice(queueItem.url.indexOf('#')).replace(dotRE, '\\.')).length === 0) {
-              grunt.log.error('Error finding content with the following fragment identifier linked from ' + chalk.cyan(queueItem.referrer) + ' to ' + chalk.magenta(queueItem.url));
+              warnUnlessForced('Error finding content with the following fragment identifier linked from ' + chalk.cyan(queueItem.referrer) + ' to ' + chalk.magenta(queueItem.url));
               errors = true;
             }
           } catch (e) {
-            grunt.log.error('The following URL was formatted incorrectly linked from ' + chalk.cyan(queueItem.referrer) + ' to ' + chalk.magenta(queueItem.url));
+            warnUnlessForced('The following URL was formatted incorrectly linked from ' + chalk.cyan(queueItem.referrer) + ' to ' + chalk.magenta(queueItem.url));
             errors = true;
           }
         }
