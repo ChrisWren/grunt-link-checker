@@ -18,7 +18,7 @@ module.exports = function (grunt) {
     var done = this.async();
     var options = this.options();
     var errors = false;
-    var site = this.data.site;
+    var site = this.data.site || options.site;
     var dotRE = /\./g;
 
     grunt.log.ok('Checking for broken links at: ' + site + (options.initialPort ? ':' + options.initialPort : ''));
@@ -45,9 +45,16 @@ module.exports = function (grunt) {
       .on('fetchclienterror', function(queueItem) {
         errors = true;
         if (!queueItem.referrer) {
-          return grunt.log.error('Error fetching `site` URL: ' + chalk.magenta(queueItem.url));
+          grunt.log.error('Error fetching `site` URL: ' + chalk.magenta(queueItem.url));
         }
         grunt.log.error('Client error fetching the following resource linked from ' + queueItem.referrer ? chalk.cyan(queueItem.referrer) : site + ' to ' + chalk.magenta(queueItem.url));
+      })
+      .on('fetchredirect', function(queueItem) {
+        if (!options.checkRedirect) {
+          return;
+        }
+        errors = true;
+        grunt.log.error('Redirect detected from ' + chalk.cyan(queueItem.url) + ' to', chalk.magenta(queueItem.stateData.headers.location));
       })
       .on('complete', function() {
         if (!errors) {
