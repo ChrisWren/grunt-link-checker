@@ -12,6 +12,14 @@ module.exports = function (grunt) {
         options: {
           initialPort: 9001
         }
+      },
+      redirect: {
+        site: 'localhost',
+        options: {
+          force: true,
+          checkRedirect: true,
+          initialPort: 9001
+        }
       }
     },
 
@@ -27,15 +35,20 @@ module.exports = function (grunt) {
     connect: {
       server: {
         options: {
+          base: 'test/fixtures',
           port: '<%= linkChecker.all.options.initialPort %>',
-          base: 'test/fixtures'
+          middleware: function(connect, options, middlewares) {
+            var modRewrite = require('connect-modrewrite');
+            middlewares.unshift(modRewrite(['^/index3.html$ /index2.html [R=301,L]']));
+            return middlewares;
+          }
         }
       }
     }
 
   });
 
-  grunt.registerTask('default', 'linkChecker');
+  grunt.registerTask('default', 'test');
   grunt.registerTask('test', ['jshint', 'connect', 'linkChecker']);
   grunt.loadTasks('tasks');
 

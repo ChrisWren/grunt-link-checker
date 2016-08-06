@@ -64,6 +64,13 @@ linkChecker: {
 
 ### Custom options
 
+#### checkRedirect
+
+* Type: `Boolean`
+* Default: `false`
+
+Set this to `true` to check for redirects.
+
 #### noFragment
 
 * Type: `Boolean`
